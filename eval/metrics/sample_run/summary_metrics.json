@@ -1,0 +1,50 @@
+{
+  "run_id": "sample_run",
+  "group_by": [
+    "model_id",
+    "device",
+    "precision",
+    "lang",
+    "task",
+    "noise_tag",
+    "distance"
+  ],
+  "n_utterances": 7,
+  "total_audio_sec": 27.55,
+  "metrics": {
+    "wer_macro": 0.1,
+    "wer_micro": 0.2,
+    "cer_macro": 0.118095,
+    "cer_micro": 0.162791,
+    "avg_norm_error": 0.177778,
+    "exact_match_rate": 0.428571,
+    "csr": 0.666667,
+    "wrong_command_rate": 0.333333,
+    "false_activation_rate": 1.0,
+    "intent_f1_macro": 0.666667,
+    "slot_f1_macro": 1.0,
+    "rtf_mean": 0.116571,
+    "rtf_std": 0.027993,
+    "rtf_p50": 0.1,
+    "rtf_p95": 0.1567,
+    "e2e_ms_mean": 422.714286,
+    "e2e_ms_std": 147.705466,
+    "e2e_ms_p50": 340.0,
+    "e2e_ms_p95": 639.6,
+    "first_token_ms_p50": 148.0,
+    "first_token_ms_p95": 195.3,
+    "peak_ram_mb_p95": 521.7,
+    "avg_power_w_mean": 1.957143
+  },
+  "counts": {
+    "by_lang": {
+      "en": 2,
+      "zh": 3,
+      "ja": 2
+    },
+    "by_task": {
+      "asr": 3,
+      "command": 4
+    }
+  }
+}

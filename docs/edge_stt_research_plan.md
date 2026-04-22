@@ -17,16 +17,24 @@
 ## 2. 研究範圍與模型池（第一階段）
 
 > 註：在工程上，STT 任務通常由 ASR / Speech Foundation Model 負責，不一定是純文字 LLM。
+>
+> 本版固定前提：
+> - 語言範圍：**英文 / 中文 / 日文**
+> - 目標硬體：**手機（Android / iPhone）**
+> - 授權限制：**必須可商用**
 
-第一階段建議先選 4~6 個代表模型：
+第一階段建議先選 5 個代表模型，優先保留符合「多語 + 手機部署 + 可商用」條件者：
 
-1. **OpenAI Whisper tiny/base/small**（經典基線）
-2. **Distil-Whisper distil-small.en**（166M，壓縮版，適合資源受限）
-3. **NVIDIA Parakeet-TDT-0.6B-v3**（600M，多語）
-4. **Qwen3-ASR-0.6B**（600M，多語/方言）
-5. **SeamlessM4T v2 large**（2.3B，3B 內上限參考組）
+1. **OpenAI Whisper tiny**（39M，多語，超輕量手機基線）
+2. **OpenAI Whisper base**（74M，多語，手機可行主力基線）
+3. **OpenAI Whisper small**（244M，多語，中階精度組）
+4. **OpenAI Whisper large-v3-turbo**（約809M，高精度上限組）
+5. **Qwen3-ASR-0.6B**（0.6B，多語，中文能力與新架構代表）
 
-第二階段可加入超輕量模型（例如 ultra-edge 導向模型）做補充對照。
+第二階段可加入「條件式候選」做補充對照，但不列入主結論：
+- **Moonshine 非英文版本**：雖然 edge 友善，但非英文模型目前採 community license，不適合直接作為一般商用結論。
+- **Parakeet-TDT-0.6B-v3**：可商用，但官方支援語言為歐洲語系，不符合本研究的中/日需求。
+- **Distil-Whisper 系列**：目前官方主力 checkpoint 仍偏英語，不適合本版多語主題。
 
 ---
 
@@ -75,12 +83,12 @@
 - 初步比較：10~20 小時
 - 穩定結論：30 小時以上
 
-## D. 硬體矩陣（Edge 導向）
-至少包含兩種：
-1. 低功耗 CPU / SBC 裝置
-2. 行動裝置或小型邊緣運算盒（x86/ARM）
+## D. 硬體矩陣（手機導向）
+至少包含兩類手機：
+1. **中高階 Android 手機**（優先觀察 NPU / DSP / GPU 可用性）
+2. **近兩代 iPhone**（觀察 Core ML / Metal 路線）
 
-可加一台桌機 GPU 作為「能力上限」參考。
+可加一台桌機 GPU 作為「離線能力上限」參考，但最終結論以手機實測為準。
 
 ## E. 公平比較設定
 - 統一採樣率與前處理
@@ -114,21 +122,21 @@
 
 ---
 
-## 6. 決策前需先確認的三件事
+## 6. 已固定的決策條件
 
-1. **語言範圍**：中文、雙語（中英）或多語
-2. **目標硬體**：最終部署裝置類型
-3. **授權限制**：是否必須可商用（會影響模型篩選）
+1. **語言範圍**：英文 / 中文 / 日文
+2. **目標硬體**：手機
+3. **授權限制**：必須可商用
 
 ---
 
 ## 7. 初步結論
 
-在「edge 控制」情境下，建議採用「**兩層評估**」：
+在「手機上的 edge 控制」情境下，建議採用「**兩層評估**」：
 1. 先用 WER/CER 篩除明顯不適合模型；
 2. 再以 CSR、錯誤命令率、延遲與功耗做最終選型。
 
-最終研究輸出不只要回答「誰最準」，而是回答「**誰最適合在指定硬體上可靠地控制設備**」。
+最終研究輸出不只要回答「誰最準」，而是回答「**誰最適合在手機上可靠地控制設備**」。
 
 ---
 
@@ -173,9 +181,10 @@
 2. **Edge 實機效率驗證**（latency、memory、compute）
 3. **控制任務安全性**（誤觸發與錯誤命令）
 
-因此最穩健的做法是：
-- 以 Distil-Whisper / Whisper 小模型作 baseline，
-- 補上一個 edge 友善模型（如 Moonshine），
+因此本版最穩健的做法是：
+- 以 **Whisper tiny / base / small** 建立手機可跑的標準基線，
+- 用 **Whisper large-v3-turbo** 當高精度上限，
+- 用 **Qwen3-ASR-0.6B** 作為新一代多語 speech-LLM 對照，
 - 最後用「控制任務 KPI」決定是否可部署，而不是只用 WER 排名。
 
 ## 11. 參考研究與資源（供後續延伸）
@@ -191,3 +200,304 @@
 - NVIDIA Parakeet-TDT-0.6B-v3（HF）：https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
 - Qwen3-ASR-0.6B（HF）：https://huggingface.co/Qwen/Qwen3-ASR-0.6B
 - SeamlessM4T v2 large（HF）：https://huggingface.co/facebook/seamless-m4t-v2-large
+
+---
+
+## 12. 最終模型 Shortlist（5 個）
+
+以下為本研究版的最終 shortlist；排序不是最終名次，而是建議實驗順序。
+
+| 模型 | 參數量 | EN/ZH/JA | 商用可行性 | 手機部署定位 | 建議角色 |
+|---|---:|---|---|---|---|
+| **OpenAI Whisper tiny** | 39M | 支援 | 是（Apache-2.0） | 最容易上手機，適合 batch=1 / 即時測試 | 超輕量 baseline |
+| **OpenAI Whisper base** | 74M | 支援 | 是（Apache-2.0） | 手機主力甜蜜點之一 | 主 baseline |
+| **OpenAI Whisper small** | 244M | 支援 | 是（Apache-2.0） | 中高階手機可評估，可能需量化 | 精度提升組 |
+| **OpenAI Whisper large-v3-turbo** | ~809M | 支援 | 是（MIT） | 高階手機或分段/量化部署 | 高精度上限組 |
+| **Qwen3-ASR-0.6B** | 0.6B | 支援 | 是（Apache-2.0） | 新架構候選，重點看中文/日文與延遲 | 非 Whisper 對照組 |
+
+### Shortlist 選型理由
+- **Whisper tiny / base / small**：同一系列可形成清楚的大小-精度-延遲曲線，適合做手機 Pareto 分析。
+- **Whisper large-v3-turbo**：作為高精度參考，能幫你判斷手機端量化與裁切後的精度損失是否值得。
+- **Qwen3-ASR-0.6B**：在中文與多語辨識上值得納入，但是否適合手機控制場景，要特別看首 token 延遲與峰值記憶體。
+
+### 不納入主 shortlist 的原因
+- **Distil-Whisper**：官方主力 checkpoint 以英語為主，與本研究語言範圍不完全對齊。
+- **Parakeet-TDT-0.6B-v3**：可商用，但官方重點語言不含中文/日文。
+- **Moonshine 非英文 variants**：目前屬限制型 community license，商用條件不夠通用。
+
+---
+
+## 13. 實驗表格模板（可直接貼進報告）
+
+### A. 模型與部署條件表
+
+| Model | Params | License | Languages in Scope | Runtime | Precision | Streaming | Device |
+|---|---:|---|---|---|---|---|---|
+| Whisper tiny | 39M | Apache-2.0 | EN/ZH/JA | whisper.cpp / Core ML / ONNX | FP16 / INT8 | Yes/No | device_name |
+| Whisper base | 74M | Apache-2.0 | EN/ZH/JA | whisper.cpp / Core ML / ONNX | FP16 / INT8 | Yes/No | device_name |
+| Whisper small | 244M | Apache-2.0 | EN/ZH/JA | whisper.cpp / Core ML / ONNX | FP16 / INT8 / INT4 | Yes/No | device_name |
+| Whisper large-v3-turbo | ~809M | MIT | EN/ZH/JA | Transformers / ONNX / Core ML | FP16 / INT8 | Yes/No | device_name |
+| Qwen3-ASR-0.6B | 0.6B | Apache-2.0 | EN/ZH/JA | Transformers / vendor runtime | FP16 / INT8 | Yes/No | device_name |
+
+### B. 主結果表（泛化轉寫）
+
+| Model | Device | Precision | EN WER | ZH CER | JA CER | Avg Norm Error | RTF | P50 Latency (ms) | P95 Latency (ms) | Peak RAM (MB) | Avg Power (W) |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Whisper tiny | phone_a | INT8 |  |  |  |  |  |  |  |  |  |
+| Whisper base | phone_a | INT8 |  |  |  |  |  |  |  |  |  |
+| Whisper small | phone_a | INT8 |  |  |  |  |  |  |  |  |  |
+| Whisper large-v3-turbo | phone_b | INT8 |  |  |  |  |  |  |  |  |  |
+| Qwen3-ASR-0.6B | phone_b | INT8 |  |  |  |  |  |  |  |  |  |
+
+### C. 控制任務表（最重要）
+
+| Model | Device | Scenario | CSR (%) | Wrong Command Rate (%) | False Activation Rate (%) | Intent F1 | Slot F1 | P50 E2E (ms) | P95 E2E (ms) | Pass/Fail |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Whisper tiny | phone_a | quiet_nearfield |  |  |  |  |  |  |  |  |
+| Whisper tiny | phone_a | tv_noise_farfield |  |  |  |  |  |  |  |  |
+| Whisper base | phone_a | quiet_nearfield |  |  |  |  |  |  |  |  |
+| Whisper small | phone_a | appliance_noise |  |  |  |  |  |  |  |  |
+| Qwen3-ASR-0.6B | phone_b | mixed_accent |  |  |  |  |  |  |  |  |
+
+### D. 失敗案例表
+
+| ID | Model | Language | Scenario | Reference | Prediction | Error Type | Safety Severity | Notes |
+|---|---|---|---|---|---|---|---|---|
+| ex001 | Whisper base | ZH | kitchen_noise | 打開客廳的燈 | 打開客廳冷氣 | wrong_command | high | 名詞混淆 |
+| ex002 | Qwen3-ASR-0.6B | JA | farfield | 音量を下げて | 音量を上げて | polarity_flip | critical | 方向相反 |
+
+---
+
+## 14. 評測腳本規格（欄位 / 檔案格式 / 統計方式）
+
+本節目標是讓所有模型共用同一份 manifest、同一份輸出 schema、同一套統計口徑。
+
+### A. 建議目錄格式
+
+```text
+eval/
+  manifests/
+    asr_eval_manifest.jsonl
+    command_eval_manifest.jsonl
+  refs/
+    command_catalog.csv
+  preds/
+    {run_id}/predictions.jsonl
+  metrics/
+    {run_id}/utterance_metrics.csv
+    {run_id}/summary_metrics.json
+```
+
+### B. `asr_eval_manifest.jsonl`
+
+每行一筆樣本，UTF-8 JSON Lines：
+
+```json
+{"utt_id":"cv_en_0001","audio_path":"data/en/cv_en_0001.wav","lang":"en","task":"asr","split":"test","domain":"read_speech","duration_sec":4.82,"text_ref":"turn on the bedroom light","speaker_id":"spk01","accent":"us","snr_db":35.2,"distance":"near","noise_tag":"quiet"}
+{"utt_id":"fleurs_ja_0001","audio_path":"data/ja/fleurs_ja_0001.wav","lang":"ja","task":"asr","split":"test","domain":"general","duration_sec":7.11,"text_ref":"エアコンをつけてください","speaker_id":"spk19","accent":"jp","snr_db":18.4,"distance":"far","noise_tag":"tv"}
+```
+
+必要欄位：
+- `utt_id`
+- `audio_path`
+- `lang`：`en` / `zh` / `ja`
+- `task`：`asr` 或 `command`
+- `split`：`dev` / `test`
+- `text_ref`
+- `duration_sec`
+
+建議欄位：
+- `speaker_id`
+- `accent`
+- `snr_db`
+- `distance`
+- `noise_tag`
+- `device_position`
+- `command_id`
+- `intent_ref`
+- `slots_ref`
+
+### C. `command_catalog.csv`
+
+用來定義控制語句的標準語意，供 CSR / wrong-command 統計：
+
+```csv
+command_id,intent,slots_schema,safety_level,example
+cmd_light_on,light_on,"{\"room\":\"string\"}",medium,turn on the bedroom light
+cmd_volume_down,volume_down,"{\"delta\":\"number\"}",high,音量を下げて
+cmd_ac_on,ac_on,"{\"room\":\"string\"}",high,打開客廳冷氣
+```
+
+### D. `predictions.jsonl`
+
+每個模型 run 輸出一份，格式固定：
+
+```json
+{"utt_id":"cv_en_0001","model_id":"whisper-base","device":"iphone_15","precision":"int8","runtime":"coreml","streaming":false,"decode_config":{"beam_size":1,"vad":true},"text_pred":"turn on the bedroom light","lang_pred":"en","tokens":4,"audio_sec":4.82,"load_ms":120.4,"first_token_ms":182.7,"decode_ms":301.3,"e2e_ms":484.0,"rtf":0.10,"peak_ram_mb":512.4,"avg_power_w":1.9,"command_pred":{"intent":"light_on","slots":{"room":"bedroom"}}}
+```
+
+必要欄位：
+- `utt_id`
+- `model_id`
+- `device`
+- `precision`
+- `runtime`
+- `streaming`
+- `text_pred`
+- `audio_sec`
+- `e2e_ms`
+- `rtf`
+- `peak_ram_mb`
+
+控制任務額外欄位：
+- `command_pred.intent`
+- `command_pred.slots`
+- `lang_pred`
+- `first_token_ms`
+
+### E. `utterance_metrics.csv`
+
+逐句統計，便於 debug 與 error slicing：
+
+```csv
+utt_id,model_id,lang,task,wer,cer,exact_match,csr_hit,wrong_command,false_activation,intent_f1,slot_f1,e2e_ms,rtf,peak_ram_mb
+cv_en_0001,whisper-base,en,asr,0.00,0.00,1,1,0,0,1.00,1.00,484.0,0.10,512.4
+fleurs_ja_0001,qwen3-asr-0.6b,ja,command,0.25,0.12,0,0,1,0,0.00,0.50,913.2,0.28,1820.3
+```
+
+### F. `summary_metrics.json`
+
+建議至少輸出：
+
+```json
+{
+  "run_id": "2026-04-22_whisper-base_iphone15_int8",
+  "group_by": ["model_id", "device", "precision", "lang", "task", "noise_tag", "distance"],
+  "n_utterances": 1200,
+  "total_audio_sec": 5238.4,
+  "metrics": {
+    "wer_macro": 0.128,
+    "wer_micro": 0.119,
+    "cer_macro": 0.084,
+    "csr": 0.941,
+    "wrong_command_rate": 0.021,
+    "false_activation_rate": 0.008,
+    "intent_f1_macro": 0.952,
+    "slot_f1_macro": 0.933,
+    "rtf_p50": 0.18,
+    "rtf_p95": 0.31,
+    "e2e_ms_p50": 612.4,
+    "e2e_ms_p95": 1098.3,
+    "peak_ram_mb_p95": 944.1,
+    "avg_power_w_mean": 2.6
+  }
+}
+```
+
+### G. 統計方式
+
+1. **ASR 主指標**
+   - 英文用 **WER**
+   - 中文、日文以 **CER** 為主，必要時補字詞切分後 WER
+   - 報告主表建議加入 `Avg Norm Error`，做跨語言彙總
+
+2. **跨語言彙總方式**
+   - 不建議直接把英文 WER 與中日 CER 混成單一平均
+   - 建議先做語言內正規化，再取 macro average：
+   - `Avg Norm Error = mean(EN_WER, ZH_CER, JA_CER)`
+
+3. **控制任務指標**
+   - `CSR = 正確 intent 且必要 slots 正確的樣本數 / 全部 command 樣本數`
+   - `Wrong Command Rate = 產生錯誤 intent 或危險相反指令的樣本數 / 全部 command 樣本數`
+   - `False Activation Rate = 非命令音訊卻觸發命令的樣本數 / 非命令樣本數`
+
+4. **延遲與效能**
+   - `P50 / P95` 皆以 utterance-level 分布計
+   - `RTF = e2e_ms / (audio_sec * 1000)`
+   - streaming 模式另外保留 `first_token_ms`
+
+5. **顯著性與穩定性**
+   - 每組至少重跑 3 次，回報 mean ± std
+   - 主要對照可加 bootstrap 95% CI
+   - 手機功耗至少觀測完整推論區間，不只取單點峰值
+
+---
+
+## 15. 測試與執行方式（目前 repo 可直接使用）
+
+本 repo 已提供一支可直接執行的聚合腳本與一組 sample 測試資料：
+
+- 聚合腳本：`scripts/eval_aggregate.py`
+- 測試檔：`tests/test_eval_aggregate.py`
+- sample predictions：`eval/preds/sample_run/predictions.jsonl`
+- sample 輸出目錄：`eval/metrics/sample_run/`
+
+### A. 產生 sample report
+
+在 repo 根目錄執行：
+
+```bash
+python3 scripts/eval_aggregate.py \
+  --asr-manifest eval/manifests/asr_eval_manifest.jsonl \
+  --command-manifest eval/manifests/command_eval_manifest.jsonl \
+  --command-catalog eval/refs/command_catalog.csv \
+  --predictions eval/preds/sample_run/predictions.jsonl \
+  --output-dir eval/metrics/sample_run \
+  --run-id sample_run
+```
+
+預期輸出：
+- `eval/metrics/sample_run/utterance_metrics.csv`
+- `eval/metrics/sample_run/summary_metrics.json`
+
+終端預期會看到類似訊息：
+
+```text
+Wrote 7 utterance rows to eval/metrics/sample_run/utterance_metrics.csv
+Wrote summary report to eval/metrics/sample_run/summary_metrics.json
+```
+
+### B. 執行單元測試
+
+在 repo 根目錄執行：
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+預期結果：
+
+```text
+test_aggregate_outputs (test_eval_aggregate.EvalAggregateTest) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in ...
+
+OK
+```
+
+### C. 測試覆蓋內容
+
+目前測試至少驗證以下行為：
+- 能正確讀取 `asr` 與 `command` 兩種 manifest
+- 能將 `predictions.jsonl` 與 reference 以 `utt_id` 正確對齊
+- 能輸出 `utterance_metrics.csv` 與 `summary_metrics.json`
+- 能正確統計 `CSR`
+- 能正確統計 `Wrong Command Rate`
+- 能正確統計 `False Activation Rate`
+- 能正確計算 `Avg Norm Error`
+
+### D. 目前 sample report 的示範結果
+
+以 `sample_run` 為例，目前輸出摘要可作為 smoke test 參考：
+
+| Metric | Value |
+|---|---:|
+| Avg Norm Error | 0.177778 |
+| CSR | 0.666667 |
+| Wrong Command Rate | 0.333333 |
+| False Activation Rate | 1.0 |
+| E2E Latency P50 (ms) | 340.0 |
+| Peak RAM P95 (MB) | 521.7 |
+
+若後續更換 sample predictions，應同步更新此表與測試 assertion。

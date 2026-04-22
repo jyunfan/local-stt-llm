@@ -1,0 +1,8 @@
+utt_id,model_id,device,precision,runtime,streaming,lang,task,noise_tag,distance,wer,cer,exact_match,csr_hit,wrong_command,false_activation,intent_f1,slot_f1,audio_sec,first_token_ms,e2e_ms,rtf,peak_ram_mb,avg_power_w
+cv_en_0001,whisper-base,iphone_15,int8,coreml,false,en,asr,quiet,near,0.2,0.16,0,0,0,0,,,4.82,152.0,480.0,0.1,512.0,1.8
+commonvoice_zh_0001,whisper-base,iphone_15,int8,coreml,false,zh,asr,fan,near,,0.166667,0,0,0,0,,,5.47,161.0,522.0,0.095,514.0,1.9
+fleurs_ja_0001,whisper-base,iphone_15,int8,coreml,false,ja,asr,tv,far,,0.166667,0,0,0,0,,,7.11,210.0,690.0,0.097,519.0,2.0
+cmd_en_0001,whisper-base,iphone_15,int8,coreml,true,en,command,quiet,near,0.0,0.0,1,1,0,0,1.0,1.0,2.64,132.0,302.0,0.114,520.0,2.0
+cmd_zh_0001,whisper-base,iphone_15,int8,coreml,true,zh,command,kitchen,far,,0.333333,0,0,1,0,0.0,1.0,2.11,145.0,330.0,0.156,521.0,2.1
+cmd_ja_0001,whisper-base,iphone_15,int8,coreml,true,ja,command,tv,far,,0.0,1,1,0,0,1.0,1.0,1.88,141.0,295.0,0.157,522.0,2.0
+noncmd_zh_0001,whisper-base,iphone_15,int8,coreml,true,zh,command,quiet,near,,0.0,1,0,0,1,0.0,0.0,3.52,148.0,340.0,0.097,518.0,1.9

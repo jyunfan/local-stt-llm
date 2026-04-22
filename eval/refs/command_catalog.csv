@@ -1,0 +1,8 @@
+command_id,intent,slots_schema,safety_level,example
+cmd_light_on,light_on,"{""room"":""string""}",medium,turn on the bedroom light
+cmd_light_off,light_off,"{""room"":""string""}",medium,turn off the bedroom light
+cmd_ac_on,ac_on,"{""room"":""string""}",high,打開客廳冷氣
+cmd_ac_off,ac_off,"{""room"":""string""}",high,關掉客廳冷氣
+cmd_volume_up,volume_up,"{""delta"":""enum[up,step]""}",high,音量を上げて
+cmd_volume_down,volume_down,"{""delta"":""enum[down,step]""}",high,音量を下げて
+none,none,"{}",low,non-command utterance
