@@ -129,3 +129,65 @@
 2. 再以 CSR、錯誤命令率、延遲與功耗做最終選型。
 
 最終研究輸出不只要回答「誰最準」，而是回答「**誰最適合在指定硬體上可靠地控制設備**」。
+
+---
+
+## 8. 與既有研究「相同/可直接沿用」的部分
+
+以下整理目前可對齊的既有研究方向，對應你現在要做的 edge STT 小模型評估：
+
+### A. 小模型蒸餾與資源受限推論（與本研究高度重疊）
+- **Distil-Whisper（2023）**：核心問題就是大型 ASR 在低延遲與資源受限場景部署困難，透過知識蒸餾降低模型成本。
+- **可沿用**：以「準確率 vs 延遲/記憶體」做比較的思路，適合放進本計畫的第一層篩選。
+
+### B. Edge 裝置語音辨識（與本研究場景高度重疊）
+- **EdgeSpeechNets（2018）**：直接針對 edge 語音辨識，並以模型大小、運算量、手機延遲做比較。
+- **TinySpeech（2020）**：同樣聚焦小型化、低計算成本的 on-device speech recognition。
+- **可沿用**：
+  1. 把「模型 footprint、MACs、實機延遲」列為主指標。
+  2. 強調「在實際裝置上的效率」而非只看離線準確率。
+
+### C. 指令/喚醒類語音任務（與你的控制目標直接重疊）
+- Keyword spotting / command recognition 研究長期使用 Google Speech Commands 等資料集，重點在低延遲、低誤觸發。
+- **可沿用**：把 **Wrong Command Rate、False Activation Rate** 設為主要 KPI，並加入噪聲與遠場壓力測試。
+
+### D. 開源實作趨勢（與部署方式重疊）
+- **Moonshine** 與 **Whisper 生態（如 whisper.cpp / ONNX）** 都強調 on-device 與低延遲部署。
+- **可沿用**：
+  1. 同一模型做多後端（PyTorch/ONNX/ggml）比較。
+  2. 將量化（INT8/INT4）和 streaming 模式列為獨立實驗維度。
+
+## 9. 可直接採用的「先前研究方法」對照表
+
+| 你現在要做的項目 | 先前研究已有做法 | 你可直接採用的做法 |
+|---|---|---|
+| 小模型是否可用於 edge | Distil-Whisper、EdgeSpeechNets、TinySpeech 都強調壓縮與實機效率 | 先用 WER/CER 篩選，再用延遲、記憶體、功耗做二次篩選 |
+| 是否適合控制場景 | Keyword spotting/command 任務重視誤觸發與誤判 | 把 CSR、Wrong Command Rate、False Activation 當主指標 |
+| 多硬體可部署性 | Edge 研究普遍做實機 latency/memory 驗證 | 至少兩種 edge 裝置 + 一個桌機上限組 |
+| 公平比較 | 既有研究會固定輸入條件與模型設定 | 統一採樣率/VAD/batch，分 offline 與 streaming |
+
+## 10. 補充結論（針對你的問題）
+
+你現在要做的研究，和既有文獻最重疊的核心有三點：
+1. **小模型壓縮後的可用性**（Distillation / Tiny model）
+2. **Edge 實機效率驗證**（latency、memory、compute）
+3. **控制任務安全性**（誤觸發與錯誤命令）
+
+因此最穩健的做法是：
+- 以 Distil-Whisper / Whisper 小模型作 baseline，
+- 補上一個 edge 友善模型（如 Moonshine），
+- 最後用「控制任務 KPI」決定是否可部署，而不是只用 WER 排名。
+
+## 11. 參考研究與資源（供後續延伸）
+
+- Distil-Whisper 論文（arXiv, 2023）：https://arxiv.org/abs/2311.00430
+- Multilingual DistilWhisper（arXiv, 2023）：https://arxiv.org/abs/2311.01070
+- EdgeSpeechNets（arXiv, 2018）：https://arxiv.org/abs/1810.08559
+- TinySpeech（arXiv, 2020）：https://arxiv.org/abs/2008.04245
+- Google Speech Commands Dataset（TF）：https://www.tensorflow.org/datasets/catalog/speech_commands
+- Moonshine（GitHub）：https://github.com/usefulsensors/moonshine
+- OpenAI Whisper（HF）：https://huggingface.co/openai/whisper-tiny
+- Distil-Whisper 模型卡（HF）：https://huggingface.co/distil-whisper/distil-small.en
+- NVIDIA Parakeet-TDT-0.6B-v3（HF）：https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+- Qwen3-ASR-0.6B（HF）：https://huggingface.co/Qwen/Qwen3-ASR-0.6B
+- SeamlessM4T v2 large（HF）：https://huggingface.co/facebook/seamless-m4t-v2-large
