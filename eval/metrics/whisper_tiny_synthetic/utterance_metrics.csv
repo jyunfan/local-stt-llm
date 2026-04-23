@@ -1,0 +1,4 @@
+utt_id,model_id,device,precision,runtime,streaming,lang,task,noise_tag,distance,wer,cer,exact_match,csr_hit,wrong_command,false_activation,intent_f1,slot_f1,audio_sec,first_token_ms,e2e_ms,rtf,peak_ram_mb,avg_power_w
+syn_en_0001,whisper-tiny,cpu,fp32,faster-whisper,false,en,asr,quiet,near,0.0,0.0,1,0,0,0,,,2.6,,267.632,0.102935,,
+syn_zh_0001,whisper-tiny,cpu,fp32,faster-whisper,false,zh,asr,quiet,near,,0.0,1,0,0,0,,,2.4,,11.894,0.004956,,
+syn_ja_0001,whisper-tiny,cpu,fp32,faster-whisper,false,ja,asr,quiet,near,,0.0,1,0,0,0,,,1.9,,11.414,0.006008,,

@@ -7,6 +7,7 @@ import argparse
 import csv
 import json
 import math
+import re
 import statistics
 from collections import Counter
 from pathlib import Path
@@ -93,6 +94,7 @@ def load_command_catalog(path: Path) -> dict[str, dict[str, Any]]:
 
 def normalize_text(text: str, lang: str) -> str:
     text = (text or "").strip().lower()
+    text = re.sub(r"[.,!?;:，。！？；：]", "", text)
     if lang == "en":
         return " ".join(text.split())
     return "".join(text.split())

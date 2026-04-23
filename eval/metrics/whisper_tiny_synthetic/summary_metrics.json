@@ -1,0 +1,49 @@
+{
+  "run_id": "whisper_tiny_synthetic",
+  "group_by": [
+    "model_id",
+    "device",
+    "precision",
+    "lang",
+    "task",
+    "noise_tag",
+    "distance"
+  ],
+  "n_utterances": 3,
+  "total_audio_sec": 6.9,
+  "metrics": {
+    "wer_macro": 0.0,
+    "wer_micro": 0.0,
+    "cer_macro": 0.0,
+    "cer_micro": 0.0,
+    "avg_norm_error": 0.0,
+    "exact_match_rate": 1.0,
+    "csr": null,
+    "wrong_command_rate": null,
+    "false_activation_rate": null,
+    "intent_f1_macro": null,
+    "slot_f1_macro": null,
+    "rtf_mean": 0.037966,
+    "rtf_std": 0.056267,
+    "rtf_p50": 0.006008,
+    "rtf_p95": 0.093242,
+    "e2e_ms_mean": 96.98,
+    "e2e_ms_std": 147.789162,
+    "e2e_ms_p50": 11.894,
+    "e2e_ms_p95": 242.0582,
+    "first_token_ms_p50": null,
+    "first_token_ms_p95": null,
+    "peak_ram_mb_p95": null,
+    "avg_power_w_mean": null
+  },
+  "counts": {
+    "by_lang": {
+      "en": 1,
+      "zh": 1,
+      "ja": 1
+    },
+    "by_task": {
+      "asr": 3
+    }
+  }
+}

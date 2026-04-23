@@ -1,0 +1,5 @@
+.venv-whisper/
+.pycache/
+__pycache__/
+*.pyc
+*.aiff
